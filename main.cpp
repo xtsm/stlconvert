@@ -111,7 +111,6 @@ int main(int argc, char** argv) {
         } else {
           throw format_error;
         }
-        std::cerr << facet_count << std::endl;
       }
       if (!input_stream) throw format_error;
       output_stream.seekp(80);
