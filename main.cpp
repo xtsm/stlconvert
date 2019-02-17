@@ -111,6 +111,7 @@ int main(int argc, char** argv) {
         } else {
           throw format_error;
         }
+        std::cerr << facet_count << std::endl;
       }
       if (!input_stream) throw format_error;
       output_stream.seekp(80);
@@ -119,7 +120,35 @@ int main(int argc, char** argv) {
       std::cerr << "Succesfully converted " <<  facet_count << " polygons";
       std::cerr << std::endl;
     } else {  // binary to ascii
-      // TODO(tsmx) : binary to ascii
+      char title[81];
+      input_stream.read(title, 80);
+      title[80] = '\0';
+      output_stream << "solid " << title << std::endl;
+
+      input_stream.read(reinterpret_cast<char*>(&facet_count), 4);
+      for (uint32_t k = 0; k < facet_count; k++) {
+        float vals[12];
+        input_stream.read(reinterpret_cast<char*>(vals), 48);
+        input_stream.ignore(2);
+
+        output_stream << "  facet normal";
+        for (int i = 0; i < 3; i++) {
+          output_stream << ' ' << vals[i];
+        }
+        output_stream << std::endl;
+        output_stream << "    outer loop" << std::endl;
+        for (int i = 3; i < 12; ) {
+          output_stream << "      vertex";
+          for (int j = 0; j < 3; i++, j++) {
+            output_stream << ' ' << vals[i];
+          }
+          output_stream << std::endl;
+        }
+        output_stream << "    endloop" << std::endl;
+        output_stream << "  endfacet" << std::endl;
+      }
+
+      output_stream << "endsolid " << title << std::endl;
     }
   } catch (const std::runtime_error &e) {
     std::cerr << "Error: " << e.what() << std::endl;
