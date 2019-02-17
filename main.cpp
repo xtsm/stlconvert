@@ -149,6 +149,8 @@ int main(int argc, char** argv) {
       }
 
       output_stream << "endsolid " << title << std::endl;
+      std::cerr << "Succesfully converted " <<  facet_count << " polygons";
+      std::cerr << std::endl;
     }
   } catch (const std::runtime_error &e) {
     std::cerr << "Error: " << e.what() << std::endl;
